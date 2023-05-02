@@ -1,0 +1,10 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "product-api-snapstart"
+s3_prefix = "product-api-snapstart"
+confirm_changeset = false
+capabilities = "CAPABILITY_IAM"
+image_repositories = []
+parameter_overrides = "DynamoDBTableName=\"product-api-snapstart\""

@@ -1,0 +1,10 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "product-api-standard"
+s3_prefix = "product-api-standard"
+confirm_changeset = false
+capabilities = "CAPABILITY_IAM"
+image_repositories = []
+parameter_overrides = "DynamoDBTableName=\"product-api-standard\""

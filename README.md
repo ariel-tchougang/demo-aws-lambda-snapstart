@@ -9,6 +9,7 @@ This project contains source code and supporting files for a serverless applicat
 - config-standard.toml - Deployment configuration file for standard version.
 - template-standard.yaml - A template that defines the application's AWS resources without AWS Lambda Snapstart.
 - config-snapstart.toml - Deployment configuration file for Snapstart version.
+- misc/loadtest.yaml - load test parameters
 
 
 The application uses several AWS resources, including Lambda functions and an API Gateway API. These resources are defined in the `template-standard.yaml` or `template-snapstart.yaml` files in this project. You can update the template to add AWS resources through the same deployment process that updates your application code.
@@ -150,48 +151,98 @@ demo-aws-lambda-snapstart$ sam logs -n ProductApiFunction --stack-name product-a
 You can find more information and examples about filtering Lambda function logs in the [SAM CLI Documentation](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-logging.html).
 
 ## Load testing with Artillery
-### Install Artillery
-### Standard
 
+Setup your load tests parameters to your convenience.
+
+```yaml
+config:
+  phases:
+    - duration: 90
+      arrivalRate: 100
+      name: Loadtest with 100 concurrent requests for 90 seconds
+  http:
+    timeout: 30
+scenarios:
+  - flow:
+      - post:
+          url: "{{ url }}"
+          json:
+            name: "NEW_PRODUCT"
+```
+
+
+### Install Artillery
+```bash
+npm install -g artillery@latest
+artillery dino
+```
+
+### Standard
 * Run Artillery load test
 ```bash
-RUN ARTILLERY LOAD TEST COMMAND HERE
+artillery run -t REPLACE_WITH_STANDARD_API_GW_URL -v '{ "url": "/Prod/products" }' misc/loadtest.yaml
 ```
+
+* After the load test, navigate to CloudWatch-Log Insights
+* Select the log groups /aws/lambda/product-api-standard
+* Ensure you have set the proper time-frame to cover the executions that you just executed (e.g. last 5 minutes)
+* Copy and execute the following query:
+
+```SQL
+ filter @type = "REPORT"
+    | parse @log /\d+:\/aws\/lambda\/(?<function>.*)/
+    | stats
+    count(*) as invocations,
+    pct(@duration+coalesce(@initDuration,0), 0) as p0,
+    pct(@duration+coalesce(@initDuration,0), 25) as p25,
+    pct(@duration+coalesce(@initDuration,0), 50) as p50,
+    pct(@duration+coalesce(@initDuration,0), 75) as p75,
+    pct(@duration+coalesce(@initDuration,0), 90) as p90,
+    pct(@duration+coalesce(@initDuration,0), 95) as p95,
+    pct(@duration+coalesce(@initDuration,0), 99) as p99,
+    pct(@duration+coalesce(@initDuration,0), 100) as p100
+    group by function, ispresent(@initDuration) as coldstart
+    | sort by coldstart, function
+
+```
+* Observe the results and compare runs with Cold start and runs without
+* Note the values for cold start at p90 & p95
 
 ### Snapstart
-
 * Run Artillery load test
 ```bash
-RUN ARTILLERY LOAD TEST COMMAND HERE
+artillery run -t REPLACE_WITH_SNAPSTART_API_GW_URL -v '{ "url": "/Prod/products" }' misc/loadtest.yaml
 ```
 
-### Observe results
-* After both load tests, navigate to CloudWatch-Log Insights
-* Select the log groups /aws/lambda/product-api-standard
+* After the load tests, navigate to CloudWatch-Log Insights
 * Select the log groups /aws/lambda/product-api-snapstart
 * Ensure you have set the proper time-frame to cover the executions that you just executed (e.g. last 5 minutes)
 * Copy and execute the following query:
 
 ```SQL
-filter @type = "REPORT"
-  | parse @log /\d+:\/aws\/lambda\/(?<function>.*)/
-  | parse @message /Restore Duration: (?<restoreDuration>.*?) ms/
-  | stats
-count(*) as invocations,
-pct(@duration+coalesce(@initDuration,0)+coalesce(restoreDuration,0), 0) as p0,
-pct(@duration+coalesce(@initDuration,0)+coalesce(restoreDuration,0), 25) as p25,
-pct(@duration+coalesce(@initDuration,0)+coalesce(restoreDuration,0), 50) as p50,
-pct(@duration+coalesce(@initDuration,0)+coalesce(restoreDuration,0), 90) as p90,
-pct(@duration+coalesce(@initDuration,0)+coalesce(restoreDuration,0), 95) as p95,
-pct(@duration+coalesce(@initDuration,0)+coalesce(restoreDuration,0), 99) as p99,
-pct(@duration+coalesce(@initDuration,0)+coalesce(restoreDuration,0), 100) as p100
-group by function, (ispresent(@initDuration) or ispresent(restoreDuration)) as coldstart
-  | sort by coldstart desc
+ filter @type = "REPORT"
+    | parse @log /\d+:\/aws\/lambda\/(?<function>.*)/
+    | stats
+    count(*) as invocations,
+    pct(@duration+coalesce(@initDuration,0), 0) as p0,
+    pct(@duration+coalesce(@initDuration,0), 25) as p25,
+    pct(@duration+coalesce(@initDuration,0), 50) as p50,
+    pct(@duration+coalesce(@initDuration,0), 75) as p75,
+    pct(@duration+coalesce(@initDuration,0), 90) as p90,
+    pct(@duration+coalesce(@initDuration,0), 95) as p95,
+    pct(@duration+coalesce(@initDuration,0), 99) as p99,
+    pct(@duration+coalesce(@initDuration,0), 100) as p100
+    group by function, ispresent(@initDuration) as coldstart
+    | sort by coldstart, function
 
 ```
+* Observe the results and compare runs with Cold start and runs without
+* Note the values for cold start at p90 & p95
 
-* Observe the results and compare runs with Cold start and runs without, for both lambda functions
-* Evaluate the difference in cold start / restore duration between the 2 lambda functions (should be around 40% at P90 & P95)
+### Observe results
+
+* Evaluate the difference in cold start / restore duration between the 2 lambda functions (compare values at p90 & p95 noted previously)
+* Do you observe any gain?
 
 
 ## Cleanup

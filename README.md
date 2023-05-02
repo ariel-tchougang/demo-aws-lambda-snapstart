@@ -191,7 +191,7 @@ group by function, (ispresent(@initDuration) or ispresent(restoreDuration)) as c
 ```
 
 * Observe the results and compare runs with Cold start and runs without, for both lambda functions
-* Evaluate the difference in cold start / restore duration between the 2 lambda functions (should be around 40%)
+* Evaluate the difference in cold start / restore duration between the 2 lambda functions (should be around 40% at P90 & P95)
 
 
 ## Cleanup

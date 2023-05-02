@@ -187,6 +187,7 @@ pct(@duration+coalesce(@initDuration,0)+coalesce(restoreDuration,0), 99) as p99,
 pct(@duration+coalesce(@initDuration,0)+coalesce(restoreDuration,0), 100) as p100
 group by function, (ispresent(@initDuration) or ispresent(restoreDuration)) as coldstart
   | sort by coldstart desc
+
 ```
 
 * Observe the results and compare runs with Cold start and runs without, for both lambda functions
@@ -211,4 +212,6 @@ aws cloudformation delete-stack --stack-name product-api-snapstart
 
 See the [AWS SAM developer guide](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/what-is-sam.html) for an introduction to SAM specification, the SAM CLI, and serverless application concepts.
 
-Next, you can use AWS Serverless Application Repository to deploy ready to use Apps that go beyond hello world samples and learn how authors developed their applications: [AWS Serverless Application Repository main page](https://aws.amazon.com/serverless/serverlessrepo/)
+Next, you can use AWS Serverless Application Repository to deploy ready to use Apps that go beyond hello world samples and learn how authors developed their applications: [AWS Serverless Application Repository main page](https://aws.amazon.com/serverless/serverlessrepo/).
+
+Official AWS workshop on [Java on AWS Lambda](https://catalog.workshops.aws/java-on-aws-lambda/en-US).

@@ -1,0 +1,14 @@
+config:
+  phases:
+    - duration: 180
+      arrivalRate: 100
+      name: Loadtest with 100 concurrent requests for 180 seconds
+  http:
+    timeout: 30
+scenarios:
+  - flow:
+      - post:
+          url: "{{ url }}"
+          json:
+            name: "NEW_PRODUCT"
+

@@ -41,8 +41,16 @@ ProductApiFunction$ mvn test
 
 Build your application with the `sam build` command.
 
+### Standard build (without Snapstart)
+
 ```bash
-demo-aws-lambda-snapstart$ sam build
+demo-aws-lambda-snapstart$ sam build --template-file template-standard.yaml
+```
+
+### Snapstart build
+
+```bash
+demo-aws-lambda-snapstart$ sam build --template-file template-snapstart.yaml
 ```
 
 The SAM CLI installs dependencies defined in `ProductApiFunction/pom.xml`, creates a deployment package, and saves it in the `.aws-sam/build` folder.

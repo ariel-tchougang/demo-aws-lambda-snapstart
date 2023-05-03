@@ -88,7 +88,7 @@ public class ProductApiFunction implements RequestHandler<APIGatewayProxyRequest
             product.setName(item.getString("name"));
             return buildProxyResponseEvent(product, 201);
         } catch (Exception e) {
-            System.err.println(e.getMessage());
+            context.getLogger().log("error message = " + e.getMessage());
             APIGatewayProxyResponseEvent response = new APIGatewayProxyResponseEvent();
             response.setStatusCode(500);
             response.setBody(e.getMessage());

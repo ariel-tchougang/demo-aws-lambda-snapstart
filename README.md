@@ -49,6 +49,17 @@ mvn test -f ProductApiFunction/pom.xml
 
 ## Use the SAM CLI to build, test & deploy
 
+### About SAM CLI
+
+The Serverless Application Model Command Line Interface (SAM CLI) is an extension of the AWS CLI that adds functionality for building and testing Lambda applications. It uses Docker to run your functions in an Amazon Linux environment that matches Lambda. It can also emulate your application's build environment and API.
+
+To use the SAM CLI, you need the following tools.
+
+* SAM CLI - [Install the SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html)
+* Java11 - [Install the Java 11](https://docs.aws.amazon.com/corretto/latest/corretto-11-ug/downloads-list.html)
+* Maven - [Install Maven](https://maven.apache.org/install.html)
+* Docker - [Install Docker community edition](https://hub.docker.com/search/?type=edition&offering=community)
+
 ### Build and deploy both stacks automatically
 
 ```bash
@@ -116,15 +127,6 @@ curl http://localhost:3000/
 ```
 
 #### Manually Deploy the sample application
-
-The Serverless Application Model Command Line Interface (SAM CLI) is an extension of the AWS CLI that adds functionality for building and testing Lambda applications. It uses Docker to run your functions in an Amazon Linux environment that matches Lambda. It can also emulate your application's build environment and API.
-
-To use the SAM CLI, you need the following tools.
-
-* SAM CLI - [Install the SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html)
-* Java11 - [Install the Java 11](https://docs.aws.amazon.com/corretto/latest/corretto-11-ug/downloads-list.html)
-* Maven - [Install Maven](https://maven.apache.org/install.html)
-* Docker - [Install Docker community edition](https://hub.docker.com/search/?type=edition&offering=community)
 
 To build and deploy your application for the first time, run the following in your shell:
 

@@ -1,14 +1,24 @@
 config:
   phases:
-    - duration: 180
+    - duration: 60
       arrivalRate: 100
-      name: Loadtest with 100 concurrent requests for 180 seconds
+      name: Loadtest with 100 concurrent requests for 60 seconds
   http:
     timeout: 30
+  processor: "./randomName.js"
 scenarios:
   - flow:
+      - function: "generateRandomName"
       - post:
-          url: "{{ url }}"
+          url: "/Prod/products"
           json:
-            name: "NEW_PRODUCT"
-
+            name: "{{ randomName }}"
+          capture:
+            - json: "$.id"
+              as: "productId"
+      - get:
+          url: "/Prod/products/{{ productId }}"
+      - get:
+          url: "/Prod/products"
+      - delete:
+          url: "/Prod/products/{{ productId }}"
